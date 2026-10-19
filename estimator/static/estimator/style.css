@@ -73,3 +73,14 @@ summary { cursor: pointer; color: var(--accent); }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px 18px 14px; margin-bottom: 12px; }
 .card h3 { margin-top: 14px; }
 .sources { padding-left: 18px; }
+
+
+.grid.benefits {
+  grid-template-columns: 1fr 1fr;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+@media (max-width: 560px) {
+  .grid.benefits { grid-template-columns: 1fr; }
+}

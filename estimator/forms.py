@@ -90,7 +90,7 @@ class AssignmentForm(forms.Form):
     )
     housing_treatment = forms.ChoiceField(label="Housing tax treatment", choices=TREATMENT_CHOICES)
 
-    relocation_chf = _money("Relocation allowance (CHF, year 1 only)", "One-off cash payment.")
+    relocation_chf = _money("Relocation allowance", "One-off cash payment.")
     relocation_treatment = forms.ChoiceField(label="Relocation tax treatment", choices=TREATMENT_CHOICES)
 
     moving_gbp = _money("Moving costs (£, year 1 only)", "Flights and shipping paid by the employer.")
