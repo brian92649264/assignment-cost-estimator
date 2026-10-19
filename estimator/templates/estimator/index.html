@@ -1,0 +1,152 @@
+{% load static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assignment cost estimate</title>
+  <link rel="stylesheet" href="{% static 'estimator/style.css' %}">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Assignment cost estimate</h1>
+    <p class="lede">Switzerland to UK. What an international assignment costs the employer, and what it takes to arrange. An exercise, not tax advice.</p>
+  </header>
+
+  {% if not rates_verified %}
+  <p class="banner" role="note">Rates in this build have not been checked against their sources yet. Treat all figures as draft.</p>
+  {% endif %}
+
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" id="tab-cost" aria-controls="panel-cost" aria-selected="true">Cost estimate</button>
+    <button type="button" role="tab" id="tab-immigration" aria-controls="panel-immigration" aria-selected="false">Immigration</button>
+  </div>
+
+  <section id="panel-cost" role="tabpanel" aria-labelledby="tab-cost">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.errors %}
+      <div class="errors" role="alert">
+        <strong>Please fix the following:</strong>
+        <ul>
+          {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+          {% for field in form %}{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <fieldset>
+        <legend>The assignment</legend>
+        <div class="grid">
+          {% include "estimator/_field.html" with field=form.home_country %}
+          {% include "estimator/_field.html" with field=form.host_country %}
+          {% include "estimator/_field.html" with field=form.years %}
+          {% include "estimator/_field.html" with field=form.salary_chf %}
+          {% include "estimator/_field.html" with field=form.bonus_chf %}
+          {% include "estimator/_field.html" with field=form.chf_per_gbp %}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Assignment benefits</legend>
+        <p class="hint">Choose how the UK taxes each benefit. This changes the tax the employer pays.</p>
+        <div class="grid">
+          {% include "estimator/_field.html" with field=form.housing_monthly_gbp %}
+          {% include "estimator/_field.html" with field=form.housing_treatment %}
+          {% include "estimator/_field.html" with field=form.relocation_chf %}
+          {% include "estimator/_field.html" with field=form.relocation_treatment %}
+          {% include "estimator/_field.html" with field=form.moving_gbp %}
+          {% include "estimator/_field.html" with field=form.moving_treatment %}
+          {% include "estimator/_field.html" with field=form.temp_housing_gbp %}
+          {% include "estimator/_field.html" with field=form.temp_housing_treatment %}
+        </div>
+      </fieldset>
+
+      <button type="submit" class="primary">Calculate cost</button>
+    </form>
+
+    {% if not_built_message %}
+    <div class="notice" role="status">
+      <strong>Not available yet.</strong> {{ not_built_message }}
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="result">
+      <h2>Employer cost</h2>
+
+      <div class="summary">
+        <div><span class="label">Whole assignment</span><span class="value">£{{ result.total_cost|floatformat:"2g" }}</span></div>
+        <div><span class="label">Multiple of home pay</span><span class="value">{{ result.multiple_of_home_pay|floatformat:2 }}x</span></div>
+      </div>
+
+      {% for year in result.years %}
+      <h3>Year {{ year.year_number }}</h3>
+      <table>
+        <thead><tr><th>Item</th><th class="num">£</th></tr></thead>
+        {% for section in year.sections %}
+        <tbody>
+          <tr class="section"><th colspan="2">{{ section.title }}</th></tr>
+          {% for line in section.lines %}
+          <tr>
+            <td>{{ line.label }}
+              {% if line.treatment %}<span class="tag">{{ line.treatment }}</span>{% endif %}
+              {% if line.note %}<span class="note">{{ line.note }}</span>{% endif %}
+            </td>
+            <td class="num">{% if section.reduces_cost %}&minus;{% endif %}{{ line.amount_gbp|floatformat:"2g" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        {% endfor %}
+        <tfoot>
+          <tr><th>Employer cost, year {{ year.year_number }}</th><th class="num">{{ year.employer_cost|floatformat:"2g" }}</th></tr>
+          <tr><td>Multiple of home pay</td><td class="num">{{ year.multiple_of_home_pay|floatformat:2 }}x</td></tr>
+        </tfoot>
+      </table>
+
+      <details>
+        <summary>Show gross-up working, year {{ year.year_number }}</summary>
+        <p class="hint">Pay before tax I = £{{ year.gross_up.initial_pay|floatformat:"2g" }}. We solve T = UKTax(I + T) by feeding each answer back in until it stops changing.</p>
+        <table class="compact">
+          <thead><tr><th>Step</th><th class="num">Assumed T</th><th class="num">UKTax(I + T)</th></tr></thead>
+          <tbody>
+            {% for step in year.gross_up.steps %}
+            <tr><td>{{ step.iteration }}</td><td class="num">{{ step.assumed_tax|floatformat:"2g" }}</td><td class="num">{{ step.resulting_tax|floatformat:"2g" }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </details>
+      {% endfor %}
+
+      <h3>Assumptions</h3>
+      <ul>{% for item in result.assumptions %}<li>{{ item }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <h3>Rules and sources</h3>
+    <ul class="sources">
+      {% for rule in rules %}
+      <li><strong>{{ rule.name }}.</strong> {{ rule.detail }} <a href="{{ rule.source }}" target="_blank" rel="noopener">Source</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section id="panel-immigration" role="tabpanel" aria-labelledby="tab-immigration" hidden>
+    <h2>Immigration</h2>
+    {% for topic in immigration_topics %}
+    <article class="card">
+      <h3>{{ topic.title }}</h3>
+      {% if topic.requirement %}
+        <p>{{ topic.requirement }}</p>
+        {% if topic.source %}<p><a href="{{ topic.source }}" target="_blank" rel="noopener">Official source</a></p>{% endif %}
+      {% else %}
+        <p class="muted">Not researched yet.</p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+</main>
+<script src="{% static 'estimator/app.js' %}"></script>
+</body>
+</html>
