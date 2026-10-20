@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal as D
 from types import ModuleType
 
-from ..data import uk_rates
+from ..data import swiss_rates, uk_rates
 from . import swiss as swiss_module
 from . import uk_tax
 from .grossup import GrossUpResult, gross_up
@@ -197,7 +197,6 @@ def _assumptions(inputs: AssignmentInputs) -> list[str]:
         f"Exchange rate fixed at £1 = CHF {inputs.chf_per_gbp} for all years.",
         "The employee is UK tax resident throughout and leaves Swiss tax residence.",
         "The UK subsidiary runs the payroll; the employer pays all UK income tax.",
-        "Hypothetical tax is what a single person in the city of Zurich would pay, "
-        "with no church tax; occupational pension (BVG) is excluded.",
         f"Social security system applied: {uk_rates.SOCIAL_SECURITY_SYSTEM}.",
+        *swiss_rates.ASSUMPTIONS,
     ]

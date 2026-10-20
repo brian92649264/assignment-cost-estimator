@@ -84,3 +84,8 @@ summary { cursor: pointer; color: var(--accent); }
 @media (max-width: 560px) {
   .grid.benefits { grid-template-columns: 1fr; }
 }
+
+button.primary {
+  display: block;
+  margin: 0 auto;
+}

@@ -15,7 +15,8 @@ from .engine.calculator import (
 
 COUNTRIES_HOME = [("CH", "Switzerland (city of Zurich)")]
 COUNTRIES_HOST = [("GB", "United Kingdom (London)")]
-TREATMENT_CHOICES = [(k, v) for k, v in TREATMENT_LABELS.items()]
+YEAR_CHOICES = [(1, "1 year"), (2, "2 years"), (3, "3 years")]
+TREATMENT_CHOICES = list(TREATMENT_LABELS.items())
 
 # Defaults are the test case from the assessment pack.
 TEST_CASE_INITIAL = {
@@ -36,11 +37,10 @@ TEST_CASE_INITIAL = {
 }
 
 
-def _money(label: str, help_text: str, required: bool = True) -> forms.DecimalField:
+def _money(label: str) -> forms.DecimalField:
+    """A non-negative amount of money, with readable error messages."""
     return forms.DecimalField(
         label=label,
-        help_text=help_text,
-        required=required,
         min_value=D("0"),
         max_digits=12,
         decimal_places=2,
@@ -54,26 +54,22 @@ def _money(label: str, help_text: str, required: bool = True) -> forms.DecimalFi
     )
 
 
+def _treatment(label: str) -> forms.ChoiceField:
+    """Dropdown for how the UK taxes a benefit."""
+    return forms.ChoiceField(label=label, choices=TREATMENT_CHOICES)
+
+
 class AssignmentForm(forms.Form):
-    home_country = forms.ChoiceField(
-        label="Home country", choices=COUNTRIES_HOME,
-        help_text="Where the employee is paid and taxed today.",
-    )
-    host_country = forms.ChoiceField(
-        label="Host country", choices=COUNTRIES_HOST,
-        help_text="Where the employee will work. The employer pays this country's tax.",
-    )
+    # The assignment
+    home_country = forms.ChoiceField(label="Home country", choices=COUNTRIES_HOME)
+    host_country = forms.ChoiceField(label="Host country", choices=COUNTRIES_HOST)
     years = forms.TypedChoiceField(
-        label="Assignment length",
-        choices=[(1, "1 year"), (2, "2 years"), (3, "3 years")],
-        coerce=int,
-        help_text="Each assignment year is one UK tax year (6 April to 5 April).",
+        label="Assignment length", choices=YEAR_CHOICES, coerce=int
     )
-    salary_chf = _money("Base salary (CHF a year)", "Annual home salary before any tax.")
-    bonus_chf = _money("Bonus (CHF a year)", "Annual bonus. Enter 0 if there is none.")
+    salary_chf = _money("Base salary (CHF a year)")
+    bonus_chf = _money("Bonus (CHF a year)")
     chf_per_gbp = forms.DecimalField(
         label="Exchange rate (CHF per £1)",
-        help_text="For example 1.10 means £1 = CHF 1.10. Fixed for every year.",
         min_value=D("0.0001"),
         max_digits=8,
         decimal_places=4,
@@ -84,20 +80,18 @@ class AssignmentForm(forms.Form):
         },
     )
 
-    housing_monthly_gbp = _money(
-        "Housing in the UK (£ a month)",
-        "Rent the employer pays each month for the whole assignment.",
-    )
-    housing_treatment = forms.ChoiceField(label="Housing tax treatment", choices=TREATMENT_CHOICES)
+    # Assignment benefits: each is an amount plus its UK tax treatment.
+    housing_monthly_gbp = _money("Housing in the UK (£ a month)")
+    housing_treatment = _treatment("Housing tax treatment")
 
-    relocation_chf = _money("Relocation allowance", "One-off cash payment.")
-    relocation_treatment = forms.ChoiceField(label="Relocation tax treatment", choices=TREATMENT_CHOICES)
+    relocation_chf = _money("Relocation allowance")
+    relocation_treatment = _treatment("Relocation tax treatment")
 
-    moving_gbp = _money("Moving costs (£, year 1 only)", "Flights and shipping paid by the employer.")
-    moving_treatment = forms.ChoiceField(label="Moving costs tax treatment", choices=TREATMENT_CHOICES)
+    moving_gbp = _money("Moving costs (£, year 1 only)")
+    moving_treatment = _treatment("Moving costs tax treatment")
 
-    temp_housing_gbp = _money("Temporary housing (£, year 1 only)", "For example a serviced apartment.")
-    temp_housing_treatment = forms.ChoiceField(label="Temporary housing tax treatment", choices=TREATMENT_CHOICES)
+    temp_housing_gbp = _money("Temporary housing (£, year 1 only)")
+    temp_housing_treatment = _treatment("Temporary housing tax treatment")
 
     def to_inputs(self) -> AssignmentInputs:
         """Turn validated form data into the engine's input object."""
