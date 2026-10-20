@@ -89,3 +89,12 @@ button.primary {
   display: block;
   margin: 0 auto;
 }
+
+.card-sources {
+  text-align: center;
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: .9rem;
+  color: var(--muted);
+}

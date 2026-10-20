@@ -54,7 +54,18 @@ class SourceTests(SimpleTestCase):
             self.assertTrue(rule["source"], rule["name"])
             self.assertIn("gov.uk", rule["source"], rule["name"])
 
-    def test_every_researched_immigration_topic_has_a_source(self):
+    def test_immigration_covers_permit_visit_and_passport(self):
+        keys = {topic["key"] for topic in immigration.TOPICS}
+        self.assertTrue({"work_permit", "business_visit", "passport"} <= keys)
+
+    def test_every_immigration_box_has_a_summary_and_official_sources(self):
         for topic in immigration.TOPICS:
-            if topic["requirement"]:
-                self.assertTrue(topic["source"], topic["title"])
+            self.assertTrue(topic["summary"], topic["title"])
+            self.assertTrue(topic["sources"], topic["title"])
+            for source in topic["sources"]:
+                self.assertIn("gov.uk", source["url"], topic["title"])
+
+    def test_immigration_tab_shows_points_and_links(self):
+        response = self.client.get(reverse("index"))
+        self.assertContains(response, "Senior or Specialist Worker visa")
+        self.assertContains(response, "https://www.gov.uk/senior-specialist-worker-visa")

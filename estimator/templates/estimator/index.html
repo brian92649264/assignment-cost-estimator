@@ -136,14 +136,12 @@
     <h2>Immigration</h2>
     {% for topic in immigration_topics %}
     <article class="card">
-      <h3>{{ topic.title }}</h3>
-      {% if topic.requirement %}
-        <p>{{ topic.requirement }}</p>
-        {% if topic.source %}<p><a href="{{ topic.source }}" target="_blank" rel="noopener">Official source</a></p>{% endif %}
-      {% else %}
-        <p class="muted">Not researched yet.</p>
-      {% endif %}
-    </article>
+  <h3>{{ topic.title }}</h3>
+  <p>{{ topic.summary }}</p>
+  <p class="card-sources">Sources:
+    {% for source in topic.sources %}<a href="{{ source.url }}" target="_blank" rel="noopener">{{ source.label }}</a>{% if not forloop.last %} &middot; {% endif %}{% endfor %}
+  </p>
+</article>
     {% endfor %}
   </section>
 </main>
