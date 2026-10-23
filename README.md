@@ -5,7 +5,7 @@ from Switzerland (city of Zurich) to the UK (London) on a tax-equalised
 assignment, where the employer pays the UK tax. A second tab sets out the
 immigration requirements.
 
-**Loom walkthrough:** ADD YOUR LOOM LINK HERE
+**Loom walkthrough:**  https://drive.google.com/file/d/1BfX7eL0JngqgvSEY6pRqJ3iH81NAwnfD/view?usp=drive_link
 
 ---
 
