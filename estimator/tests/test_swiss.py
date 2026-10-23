@@ -78,6 +78,19 @@ class TariffTests(SimpleTestCase):
         )
 
 
+class SwissSourceTests(SimpleTestCase):
+    """Every Swiss rule shown on the page must link to an official site."""
+
+    OFFICIAL = ("gov.uk", "admin.ch", "zh.ch")
+
+    def test_every_swiss_rule_has_an_official_source(self):
+        for rule in swiss_rates.RULES:
+            self.assertTrue(rule["source"], rule["name"])
+            self.assertTrue(
+                any(domain in rule["source"] for domain in self.OFFICIAL), rule["name"]
+            )
+
+
 class PensionTests(SimpleTestCase):
     def test_no_pension_below_entry_threshold(self):
         self.assertEqual(swiss.bvg_employee(D("20000")), D("0"))
