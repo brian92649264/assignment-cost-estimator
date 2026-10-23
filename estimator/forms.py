@@ -4,10 +4,10 @@ from decimal import Decimal as D
 
 from django import forms
 
+from .data import uk_benefits
 from .engine.calculator import (
-    BIK,
     CASH,
-    EXEMPT,
+    REMOVAL,
     TREATMENT_LABELS,
     AssignmentInputs,
     Benefit,
@@ -27,13 +27,13 @@ TEST_CASE_INITIAL = {
     "years": 2,
     "chf_per_gbp": "1.10",
     "housing_monthly_gbp": "3000",
-    "housing_treatment": BIK,
+    "housing_treatment": CASH,
     "relocation_chf": "5000",
     "relocation_treatment": CASH,
     "moving_gbp": "6000",
-    "moving_treatment": EXEMPT,
+    "moving_treatment": REMOVAL,
     "temp_housing_gbp": "4000",
-    "temp_housing_treatment": EXEMPT,
+    "temp_housing_treatment": REMOVAL,
 }
 
 
@@ -98,10 +98,22 @@ class AssignmentForm(forms.Form):
         d = self.cleaned_data
         fx = d["chf_per_gbp"]
         benefits = [
-            Benefit("Housing in London", d["housing_monthly_gbp"] * 12, d["housing_treatment"]),
-            Benefit("Relocation allowance", d["relocation_chf"] / fx, d["relocation_treatment"], True),
-            Benefit("Moving costs", d["moving_gbp"], d["moving_treatment"], True),
-            Benefit("Temporary housing", d["temp_housing_gbp"], d["temp_housing_treatment"], True),
+            Benefit(
+                "Housing in London", d["housing_monthly_gbp"] * 12,
+                d["housing_treatment"], note=uk_benefits.HOUSING_NOTE,
+            ),
+            Benefit(
+                "Relocation allowance", d["relocation_chf"] / fx,
+                d["relocation_treatment"], True, uk_benefits.RELOCATION_NOTE,
+            ),
+            Benefit(
+                "Moving costs", d["moving_gbp"],
+                d["moving_treatment"], True, uk_benefits.MOVING_NOTE,
+            ),
+            Benefit(
+                "Temporary housing", d["temp_housing_gbp"],
+                d["temp_housing_treatment"], True, uk_benefits.TEMP_HOUSING_NOTE,
+            ),
         ]
         return AssignmentInputs(
             home_country=d["home_country"],

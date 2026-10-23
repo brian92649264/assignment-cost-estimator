@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal as D
 from types import ModuleType
 
-from ..data import swiss_rates, uk_rates
+from ..data import swiss_rates, uk_benefits, uk_rates
 from . import swiss as swiss_module
 from . import uk_tax
 from .grossup import GrossUpResult, gross_up
@@ -23,10 +23,12 @@ from .grossup import GrossUpResult, gross_up
 CASH = "cash"
 BIK = "bik"
 EXEMPT = "exempt"
+REMOVAL = "removal"
 TREATMENT_LABELS = {
     CASH: "Taxable cash",
     BIK: "Taxable benefit in kind",
     EXEMPT: "Not taxable in the UK",
+    REMOVAL: "Removal cost (first £8,000 not taxed)",
 }
 TAXABLE_TREATMENTS = {CASH, BIK}
 
@@ -35,8 +37,9 @@ TAXABLE_TREATMENTS = {CASH, BIK}
 class Benefit:
     label: str
     amount_gbp: D  # for the year it applies
-    treatment: str  # CASH, BIK or EXEMPT
+    treatment: str  # CASH, BIK, EXEMPT or REMOVAL
     year_one_only: bool = False
+    note: str = ""
 
 
 @dataclass(frozen=True)
@@ -105,13 +108,54 @@ def calculate(
 ) -> AssignmentResult:
     """Run the full estimate. `swiss` is injectable so tests can use fixed rates."""
     fx = inputs.chf_per_gbp
-    years = [_calculate_year(n, inputs, swiss, fx) for n in range(1, inputs.years + 1)]
+    # One £8,000 removal exemption covers the whole assignment, so we carry
+    # what is left from one year into the next.
+    removal_left = uk_benefits.REMOVAL_EXEMPTION_LIMIT
+    years = []
+    for n in range(1, inputs.years + 1):
+        year, removal_left = _calculate_year(n, inputs, swiss, fx, removal_left)
+        years.append(year)
     return AssignmentResult(years=years, assumptions=_assumptions(inputs))
 
 
+def _benefit_lines(active: list[Benefit], removal_left: D) -> tuple[list[Line], D, D]:
+    """Turn this year's benefits into table lines.
+
+    Returns the lines, the amount of benefits that is taxable in the UK, and the
+    part of the £8,000 removal exemption still unused afterwards.
+    """
+    lines: list[Line] = []
+    taxable = D("0")
+    for b in active:
+        note = b.note
+        if b.treatment == REMOVAL:
+            exempt_part = min(b.amount_gbp, removal_left)
+            taxed_part = b.amount_gbp - exempt_part
+            removal_left -= exempt_part
+            taxable += taxed_part
+            limit = f"£{uk_benefits.REMOVAL_EXEMPTION_LIMIT:,.0f}"
+            if taxed_part > 0:
+                note = (
+                    f"£{exempt_part:,.0f} is within the {limit} removal limit; "
+                    f"£{taxed_part:,.0f} is above it and taxed."
+                )
+            else:
+                note = f"Within the {limit} removal limit. {b.note}".strip()
+        elif b.treatment in TAXABLE_TREATMENTS:
+            taxable += b.amount_gbp
+        lines.append(
+            Line(b.label, b.amount_gbp, note, treatment=TREATMENT_LABELS[b.treatment])
+        )
+    return lines, taxable, removal_left
+
+
 def _calculate_year(
-    year_number: int, inputs: AssignmentInputs, swiss: ModuleType, fx: D
-) -> YearResult:
+    year_number: int,
+    inputs: AssignmentInputs,
+    swiss: ModuleType,
+    fx: D,
+    removal_left: D,
+) -> tuple[YearResult, D]:
     # 1. Home pay
     salary = inputs.salary_chf / fx
     bonus = inputs.bonus_chf / fx
@@ -126,16 +170,8 @@ def _calculate_year(
 
     # 2. Assignment benefits that apply this year
     active = [b for b in inputs.benefits if year_number == 1 or not b.year_one_only]
-    benefit_section = Section(
-        "2. Assignment benefits",
-        [
-            Line(b.label, b.amount_gbp, treatment=TREATMENT_LABELS[b.treatment])
-            for b in active
-        ],
-    )
-    taxable_benefits = sum(
-        (b.amount_gbp for b in active if b.treatment in TAXABLE_TREATMENTS), D("0")
-    )
+    benefit_lines, taxable_benefits, removal_left = _benefit_lines(active, removal_left)
+    benefit_section = Section("2. Assignment benefits", benefit_lines)
 
     # 4 (computed early because it feeds the gross-up). Hypothetical deductions.
     gross_chf = inputs.salary_chf + inputs.bonus_chf
@@ -181,13 +217,14 @@ def _calculate_year(
         + host_section.total
         - deductions_section.total
     )
-    return YearResult(
+    result = YearResult(
         year_number=year_number,
         sections=[home_section, benefit_section, host_section, deductions_section],
         home_pay=home_pay,
         employer_cost=employer_cost,
         gross_up=grossed,
     )
+    return result, removal_left
 
 
 def _assumptions(inputs: AssignmentInputs) -> list[str]:
@@ -198,5 +235,6 @@ def _assumptions(inputs: AssignmentInputs) -> list[str]:
         "The employee is UK tax resident throughout and leaves Swiss tax residence.",
         "The UK subsidiary runs the payroll; the employer pays all UK income tax.",
         f"Social security system applied: {uk_rates.SOCIAL_SECURITY_SYSTEM}.",
+        *uk_benefits.ASSUMPTIONS,
         *swiss_rates.ASSUMPTIONS,
     ]

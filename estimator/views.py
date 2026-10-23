@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .data import immigration, swiss_rates, uk_rates
+from .data import immigration, swiss_rates, uk_benefits, uk_rates
 from .engine.calculator import calculate
 from .forms import TEST_CASE_INITIAL, AssignmentForm
 
@@ -8,7 +8,7 @@ from .forms import TEST_CASE_INITIAL, AssignmentForm
 def index(request):
     context = {
         "immigration_topics": immigration.TOPICS,
-        "rules": uk_rates.RULES + swiss_rates.RULES,
+        "rules": uk_rates.RULES + uk_benefits.RULES + swiss_rates.RULES,
         "rates_verified": uk_rates.VERIFIED,
         "tax_year": uk_rates.TAX_YEAR,
         "active_tab": "cost",
