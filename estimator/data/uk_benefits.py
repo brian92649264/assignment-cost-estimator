@@ -1,12 +1,5 @@
-"""UK tax treatment of assignment benefits, with the HMRC page for each rule.
-
-Researched on 20 October 2026 from GOV.UK and HMRC manuals.
-"""
-
 from decimal import Decimal as D
 
-# The first £8,000 of qualifying removal expenses and benefits is not taxed.
-# Only the amount above the limit is charged (not the whole amount).
 REMOVAL_EXEMPTION_LIMIT = D("8000")
 
 EIM_RENT = "https://www.gov.uk/hmrc-internal-manuals/employment-income-manual/eim11521"
@@ -19,7 +12,6 @@ HS212 = (
     "self-assessment-helpsheet/tax-equalisation-2026-hs212"
 )
 
-# Short notes shown beside each benefit in the cost table.
 HOUSING_NOTE = "Rent paid to the landlord for the employee counts as earnings."
 RELOCATION_NOTE = "Assumed a fixed cash allowance, not paid against receipts, so taxed in full."
 MOVING_NOTE = "Assumed to be qualifying removal costs (flights and shipping)."

@@ -1,17 +1,3 @@
-"""Tax-on-tax gross-up.
-
-The employer pays the employee's UK tax, and that tax is itself taxable pay.
-So the tax T satisfies   T = UKTax(I + T)   where I is pay before any tax.
-
-UK rates change between bands and the personal allowance is withdrawn above
-£100,000, so there is no single multiplier. We solve it by fixed-point
-iteration: guess T = 0, compute UKTax(I + T), feed the result back in, repeat
-until it stops moving.
-
-This converges because the highest marginal rate (60% in the allowance taper
-zone) is below 100%: each pass shrinks the remaining error.
-"""
-
 from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal as D
@@ -24,15 +10,15 @@ class GrossUpError(Exception):
 @dataclass(frozen=True)
 class GrossUpStep:
     iteration: int
-    assumed_tax: D  # the T we fed in
-    resulting_tax: D  # UKTax(I + assumed_tax)
+    assumed_tax: D  
+    resulting_tax: D  
 
 
 @dataclass(frozen=True)
 class GrossUpResult:
-    initial_pay: D  # I
-    tax: D  # T
-    taxable_pay: D  # I + T
+    initial_pay: D  
+    tax: D  
+    taxable_pay: D  
     steps: list[GrossUpStep]
 
     @property

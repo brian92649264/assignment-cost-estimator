@@ -1,4 +1,3 @@
-// Tab switching. Everything else is server-rendered.
 (function () {
   const tabs = document.querySelectorAll('[role="tab"]');
 

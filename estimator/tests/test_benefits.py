@@ -1,8 +1,3 @@
-"""Tests for the UK tax treatment of benefits, mainly the £8,000 removal limit.
-
-Uses a fake Swiss module with fixed deductions so the numbers are easy to follow.
-"""
-
 from decimal import Decimal as D
 from types import SimpleNamespace
 
@@ -18,7 +13,6 @@ from estimator.engine.calculator import (
     calculate,
 )
 
-# CHF 100,000 pay at 1:1 with CHF 10,000 hypothetical deductions => net 90,000.
 FAKE_SWISS = SimpleNamespace(
     hypothetical_income_tax_chf=lambda gross: D("6000"),
     hypothetical_social_security_chf=lambda gross: D("4000"),
@@ -43,7 +37,6 @@ class RemovalLimitTests(SimpleTestCase):
         result = calculate(
             make_inputs([Benefit("Moving", D("5000"), REMOVAL, True)]), swiss=FAKE_SWISS
         )
-        # Initial pay is just net pay: nothing from the benefit is taxable.
         self.assertEqual(result.years[0].gross_up.initial_pay, D("90000"))
 
     def test_only_the_excess_over_the_limit_is_taxed(self):
@@ -53,7 +46,6 @@ class RemovalLimitTests(SimpleTestCase):
         ]
         result = calculate(make_inputs(benefits), swiss=FAKE_SWISS)
         year1 = result.years[0]
-        # 10,000 of removal costs, 8,000 exempt, so 2,000 is taxable.
         self.assertEqual(year1.gross_up.initial_pay, D("92000"))
         lines = year1.sections[1].lines
         self.assertIn("Within the £8,000", lines[0].note)
@@ -68,7 +60,6 @@ class RemovalLimitTests(SimpleTestCase):
         self.assertEqual(result.years[0].sections[1].total, D("10000"))
 
     def test_the_limit_is_shared_across_years(self):
-        # 5,000 a year for 2 years: year 1 uses 5,000, year 2 has 3,000 left.
         result = calculate(
             make_inputs([Benefit("Support", D("5000"), REMOVAL)]), swiss=FAKE_SWISS
         )

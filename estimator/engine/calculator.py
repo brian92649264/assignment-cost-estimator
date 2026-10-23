@@ -1,16 +1,3 @@
-"""Employer cost of an assignment, year by year.
-
-Tax equalisation in one line: the employee keeps paying their usual home tax
-(the hypothetical deductions), and the employer pays all the host tax.
-
-Per year:
-    home pay            salary + bonus, as if they had stayed in Switzerland
-  + assignment benefits (housing, relocation, ...), each tagged by UK tax treatment
-  + UK tax and charges  income tax incl. tax on tax, plus employer NI if it applies
-  - hypothetical Swiss tax and social security
-  = employer cost
-"""
-
 from dataclasses import dataclass, field
 from decimal import Decimal as D
 from types import ModuleType
@@ -36,8 +23,8 @@ TAXABLE_TREATMENTS = {CASH, BIK}
 @dataclass(frozen=True)
 class Benefit:
     label: str
-    amount_gbp: D  # for the year it applies
-    treatment: str  # CASH, BIK, EXEMPT or REMOVAL
+    amount_gbp: D  
+    treatment: str  
     year_one_only: bool = False
     note: str = ""
 
@@ -47,16 +34,16 @@ class AssignmentInputs:
     salary_chf: D
     bonus_chf: D
     years: int
-    chf_per_gbp: D  # £1 = CHF x
+    chf_per_gbp: D  
     benefits: list[Benefit]
 
 
 @dataclass(frozen=True)
 class Line:
     label: str
-    amount_gbp: D  # always positive; the section decides if it adds or reduces cost
+    amount_gbp: D 
     note: str = ""
-    treatment: str = ""  # tax treatment label for benefits
+    treatment: str = ""  
 
 
 @dataclass(frozen=True)
@@ -104,9 +91,6 @@ class AssignmentResult:
 def calculate(
     inputs: AssignmentInputs, swiss: ModuleType = swiss_module
 ) -> AssignmentResult:
-    """Run the full estimate. `swiss` is injectable so tests can use fixed rates."""
-    # One £8,000 removal exemption covers the whole assignment, so we carry
-    # what is left from one year into the next.
     removal_left = uk_benefits.REMOVAL_EXEMPTION_LIMIT
     years = []
     for n in range(1, inputs.years + 1):
@@ -116,11 +100,6 @@ def calculate(
 
 
 def _benefit_lines(active: list[Benefit], removal_left: D) -> tuple[list[Line], D, D]:
-    """Turn this year's benefits into table lines.
-
-    Returns the lines, the amount of benefits that is taxable in the UK, and the
-    part of the £8,000 removal exemption still unused afterwards.
-    """
     lines: list[Line] = []
     taxable = D("0")
     for b in active:
@@ -153,7 +132,7 @@ def _calculate_year(
     removal_left: D,
 ) -> tuple[YearResult, D]:
     fx = inputs.chf_per_gbp
-    # 1. Home pay
+
     salary = inputs.salary_chf / fx
     bonus = inputs.bonus_chf / fx
     home_pay = salary + bonus
@@ -165,17 +144,15 @@ def _calculate_year(
         ],
     )
 
-    # 2. Assignment benefits that apply this year
+
     active = [b for b in inputs.benefits if year_number == 1 or not b.year_one_only]
     benefit_lines, taxable_benefits, removal_left = _benefit_lines(active, removal_left)
     benefit_section = Section("2. Assignment benefits", benefit_lines)
 
-    # 4 (computed early because it feeds the gross-up). Hypothetical deductions.
     gross_chf = inputs.salary_chf + inputs.bonus_chf
     hypo_tax = swiss.hypothetical_income_tax_chf(gross_chf) / fx
     hypo_ss = swiss.hypothetical_social_security_chf(gross_chf) / fx
 
-    # 3. UK tax: gross up from I = net home pay + taxable benefits.
     initial_pay = (home_pay - hypo_tax - hypo_ss) + taxable_benefits
     grossed = gross_up(initial_pay, uk_tax.income_tax)
 

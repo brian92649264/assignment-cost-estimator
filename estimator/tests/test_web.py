@@ -1,5 +1,3 @@
-"""Form validation and page tests."""
-
 from django.test import SimpleTestCase
 from django.urls import reverse
 
@@ -47,7 +45,6 @@ class PageTests(SimpleTestCase):
 
 
 class SourceTests(SimpleTestCase):
-    """Every rule the page shows must carry an official link (assessment gate 3)."""
 
     def test_every_uk_rule_has_an_official_source(self):
         for rule in uk_rates.RULES:

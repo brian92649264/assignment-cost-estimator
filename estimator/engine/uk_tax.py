@@ -1,5 +1,3 @@
-"""UK income tax and employer National Insurance (pure functions, no Django)."""
-
 from decimal import Decimal as D
 
 from ..data import uk_rates as r
@@ -8,7 +6,6 @@ ZERO = D("0")
 
 
 def personal_allowance(income: D) -> D:
-    """Allowance after the taper: £1 lost for every £2 of income over £100,000."""
     if income <= r.TAPER_THRESHOLD:
         return r.PERSONAL_ALLOWANCE
     reduction = (income - r.TAPER_THRESHOLD) * r.TAPER_RATE
@@ -16,7 +13,6 @@ def personal_allowance(income: D) -> D:
 
 
 def income_tax(income: D) -> D:
-    """Total UK income tax on `income`. This is the UKTax() in T = UKTax(I + T)."""
     income = max(ZERO, income)
     taxable = max(ZERO, income - personal_allowance(income))
 
@@ -35,5 +31,4 @@ def income_tax(income: D) -> D:
 
 
 def employer_national_insurance(pay: D) -> D:
-    """Employer Class 1 NI on pay above the secondary threshold."""
     return max(ZERO, pay - r.EMPLOYER_NI_SECONDARY_THRESHOLD) * r.EMPLOYER_NI_RATE

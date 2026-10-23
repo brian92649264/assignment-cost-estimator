@@ -5,8 +5,6 @@ from Switzerland (city of Zurich) to the UK (London) on a tax-equalised
 assignment, where the employer pays the UK tax. A second tab sets out the
 immigration requirements.
 
-This is an exercise, not tax advice.
-
 **Loom walkthrough:** ADD YOUR LOOM LINK HERE
 
 ---
@@ -201,13 +199,11 @@ Fees and rates were checked on 20 to 23 October 2026.
 
 I used **Claude (Anthropic)** throughout this project:
 
-- **Code:** scaffolding the Django project, and drafting the calculation engine,
-  form validation, templates and tests.
+- **Code:** scaffolding the Django project, buiding project codebase, and tests.
 - **Research:** finding and reading the official GOV.UK, HMRC, ESTV and canton of
   Zurich pages, and summarising the rules.
-- **Writing:** drafting this README.
 
 I chose the stack and the approach, made the decisions on social security, the
 Swiss tax method and the benefit treatment, checked the figures against the
 official pages myself (including running the ESTV tax calculator), and changed
-the design of the pages. I can explain every part of the code.
+the design of the pages. 

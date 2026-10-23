@@ -1,21 +1,3 @@
-"""Hypothetical Swiss tax and social security (CHF, pure functions, no Django).
-
-Both are what the employee would have paid had they stayed in Zurich. The
-employer deducts them from pay, which is why they reduce the employer's cost.
-
-Method (checked against the ESTV tax calculator for a CHF 170,000 salary):
-  net income    = gross - AHV/IV/EO - unemployment (ALV) - accident (NBU) - pension (BVG)
-  taxable       = net income - professional expenses - insurance deduction
-  federal tax   = tariff on taxable income (rounded down to CHF 100)
-  Zurich tax    = basic tariff on taxable income (rounded down to CHF 100),
-                  x 95% (canton) and x 119% (city), plus a flat personal tax
-Each tax amount is rounded to the nearest whole franc, as the calculator does.
-
-Hypothetical SOCIAL SECURITY is only AHV/IV/EO and ALV (BVG excluded, per the
-brief). BVG and NBU appear here only because the calculator deducts them when
-working out taxable income.
-"""
-
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal as D
 
@@ -32,7 +14,6 @@ def _floor_to_100(amount: D) -> D:
     return (max(ZERO, amount) // 100) * 100
 
 
-# --- Social security ----------------------------------------------------------
 def ahv_iv_eo(gross: D) -> D:
     return gross * r.AHV_IV_EO_RATE
 
@@ -42,17 +23,14 @@ def alv(gross: D) -> D:
 
 
 def hypothetical_social_security_chf(gross_chf: D) -> D:
-    """AHV/IV/EO plus unemployment insurance. No BVG."""
     return ahv_iv_eo(gross_chf) + alv(gross_chf)
 
 
-# --- Deductions the calculator makes before tax -------------------------------
 def nbu(gross: D) -> D:
     return min(gross, r.NBU_SALARY_CEILING) * r.NBU_RATE
 
 
 def bvg_employee(gross: D, age: int = r.EMPLOYEE_AGE) -> D:
-    """Employee's half of the pension fund contribution."""
     if gross < r.BVG_ENTRY_THRESHOLD:
         return ZERO
     rate = next((rt for from_age, rt in r.BVG_RATE_FROM_AGE if age >= from_age), ZERO)
@@ -71,9 +49,7 @@ def professional_expenses(net_income: D) -> D:
     return min(flat, max(ZERO, net_income))
 
 
-# --- Tax tariffs --------------------------------------------------------------
 def zurich_basic_tax(taxable_income: D) -> D:
-    """Einfache Staatssteuer: marginal bands, taxable income rounded down to 100."""
     remaining = _floor_to_100(taxable_income)
     tax = ZERO
     for width, rate in r.ZH_BASIC_TARIFF:
@@ -99,7 +75,6 @@ def federal_tax(taxable_income: D) -> D:
     return ZERO if tax < r.FEDERAL_MIN_TAX else tax
 
 
-# --- Putting it together ------------------------------------------------------
 @dataclass(frozen=True)
 class SwissTaxBreakdown:
     gross_chf: D
@@ -151,5 +126,4 @@ def hypothetical_tax_breakdown(gross_chf: D) -> SwissTaxBreakdown:
 
 
 def hypothetical_income_tax_chf(gross_chf: D) -> D:
-    """Federal + cantonal + communal + personal tax on `gross_chf`."""
     return hypothetical_tax_breakdown(gross_chf).total_tax

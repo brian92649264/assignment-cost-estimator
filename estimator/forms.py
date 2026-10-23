@@ -1,5 +1,3 @@
-"""Form validation. Bad input produces readable messages, never a crash."""
-
 from decimal import Decimal as D
 
 from django import forms
@@ -18,7 +16,6 @@ COUNTRIES_HOST = [("GB", "United Kingdom (London)")]
 YEAR_CHOICES = [(1, "1 year"), (2, "2 years"), (3, "3 years")]
 TREATMENT_CHOICES = list(TREATMENT_LABELS.items())
 
-# Defaults are the test case from the assessment pack.
 TEST_CASE_INITIAL = {
     "home_country": "CH",
     "host_country": "GB",
@@ -38,7 +35,6 @@ TEST_CASE_INITIAL = {
 
 
 def _money(label: str) -> forms.DecimalField:
-    """A non-negative amount of money, with readable error messages."""
     return forms.DecimalField(
         label=label,
         min_value=D("0"),
@@ -55,12 +51,10 @@ def _money(label: str) -> forms.DecimalField:
 
 
 def _treatment(label: str) -> forms.ChoiceField:
-    """Dropdown for how the UK taxes a benefit."""
     return forms.ChoiceField(label=label, choices=TREATMENT_CHOICES)
 
 
 class AssignmentForm(forms.Form):
-    # The assignment
     home_country = forms.ChoiceField(label="Home country", choices=COUNTRIES_HOME)
     host_country = forms.ChoiceField(label="Host country", choices=COUNTRIES_HOST)
     years = forms.TypedChoiceField(
@@ -80,7 +74,6 @@ class AssignmentForm(forms.Form):
         },
     )
 
-    # Assignment benefits: each is an amount plus its UK tax treatment.
     housing_monthly_gbp = _money("Housing in the UK (£ a month)")
     housing_treatment = _treatment("Housing tax treatment")
 
@@ -94,7 +87,6 @@ class AssignmentForm(forms.Form):
     temp_housing_treatment = _treatment("Temporary housing tax treatment")
 
     def to_inputs(self) -> AssignmentInputs:
-        """Turn validated form data into the engine's input object."""
         d = self.cleaned_data
         fx = d["chf_per_gbp"]
         benefits = [

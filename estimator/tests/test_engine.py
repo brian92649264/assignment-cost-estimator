@@ -1,9 +1,3 @@
-"""Engine tests: tax bands, gross-up, and the calculator wiring.
-
-The calculator test uses a fake Swiss module with flat rates, so it checks the
-arithmetic and structure without depending on real Swiss figures.
-"""
-
 from decimal import Decimal as D
 from types import SimpleNamespace
 
@@ -28,16 +22,13 @@ class UkIncomeTaxTests(SimpleTestCase):
         self.assertEqual(uk_tax.income_tax(D("12570")), D("0"))
 
     def test_top_of_basic_band(self):
-        # Taxable 37,700 at 20%.
         self.assertEqual(uk_tax.income_tax(D("50270")), D("7540"))
 
     def test_allowance_intact_at_100k(self):
-        # Taxable 87,430: 37,700 at 20% + 49,730 at 40%.
         self.assertEqual(uk_tax.income_tax(D("100000")), D("27432"))
 
     def test_allowance_fully_withdrawn_at_125140(self):
         self.assertEqual(uk_tax.personal_allowance(D("125140")), D("0"))
-        # 37,700 at 20% + 87,440 at 40%.
         self.assertEqual(uk_tax.income_tax(D("125140")), D("42516"))
 
     def test_taper_makes_marginal_rate_sixty_percent(self):
@@ -47,7 +38,6 @@ class UkIncomeTaxTests(SimpleTestCase):
 
 class GrossUpTests(SimpleTestCase):
     def test_flat_rate_has_closed_form(self):
-        # T = 0.2 * (I + T)  =>  T = 0.25 * I
         result = gross_up(D("1000"), lambda x: x * D("0.2"))
         self.assertLess(abs(result.tax - D("250")), TOLERANCE)
 
@@ -57,7 +47,6 @@ class GrossUpTests(SimpleTestCase):
             self.assertLess(abs(result.tax - uk_tax.income_tax(pay + result.tax)), TOLERANCE)
 
     def test_single_multiplication_would_be_wrong(self):
-        # Across bands, a one-off "pay x rate" shortcut misses the true answer.
         pay = D("95000")
         result = gross_up(pay, uk_tax.income_tax)
         naive = uk_tax.income_tax(pay) / (1 - D("0.40"))

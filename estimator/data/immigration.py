@@ -1,16 +1,3 @@
-"""Immigration requirements shown on the Immigration tab.
-
-Each topic is one box: a title, a short summary (2 to 3 sentences) and the
-official GOV.UK pages the summary came from.
-
-Researched on 20 October 2026 from GOV.UK. Home Office fees are from the
-table effective 8 October 2026.
-
-Test case: a Swiss national paid CHF 150,000 salary (about GBP 136,000 at
-CHF 1.10), sent by their Swiss employer to its UK subsidiary for 2 years after
-3 years with the company.
-"""
-
 VISA_OVERVIEW = "https://www.gov.uk/senior-specialist-worker-visa"
 VISA_ELIGIBILITY = "https://www.gov.uk/senior-specialist-worker-visa/eligibility"
 VISA_COSTS = "https://www.gov.uk/senior-specialist-worker-visa/how-much-it-costs"

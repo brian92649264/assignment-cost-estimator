@@ -1,9 +1,3 @@
-"""Swiss tax and social security tests.
-
-The main test reproduces the ESTV tax calculator's result for the test case
-(CHF 170,000 gross, single, city of Zurich, 2026, no church tax).
-"""
-
 from decimal import Decimal as D
 
 from django.test import SimpleTestCase
@@ -13,7 +7,6 @@ from estimator.engine import swiss
 
 
 class EstvCalculatorTests(SimpleTestCase):
-    """Figures read from the ESTV calculator result page."""
 
     def setUp(self):
         self.b = swiss.hypothetical_tax_breakdown(D("170000"))
@@ -42,7 +35,6 @@ class EstvCalculatorTests(SimpleTestCase):
 
 class SocialSecurityTests(SimpleTestCase):
     def test_test_case_amount_and_no_bvg(self):
-        # 5.3% of 170,000 + 1.1% of 148,200. BVG is deliberately not included.
         self.assertEqual(
             swiss.hypothetical_social_security_chf(D("170000")), D("10640.200")
         )
@@ -65,7 +57,6 @@ class TariffTests(SimpleTestCase):
 
     def test_zurich_basic_tax_first_bands(self):
         self.assertEqual(swiss.zurich_basic_tax(D("7000")), D("0"))
-        # 5,000 at 2% = 100
         self.assertEqual(swiss.zurich_basic_tax(D("12000")), D("100.00"))
 
     def test_zurich_bands_add_up_to_published_threshold(self):
@@ -79,7 +70,6 @@ class TariffTests(SimpleTestCase):
 
 
 class SwissSourceTests(SimpleTestCase):
-    """Every Swiss rule shown on the page must link to an official site."""
 
     OFFICIAL = ("gov.uk", "admin.ch", "zh.ch")
 

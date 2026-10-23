@@ -1,14 +1,3 @@
-"""Swiss reference data for 2026 (CHF), with the page each rule came from.
-
-Everything here is for a single employee living in the city of Zurich, no
-children, no church tax, age 35, mirroring how the ESTV tax calculator
-treats a gross salary. Rules in RULES are shown on the page with a source link.
-
-Sources for every figure below were found and checked on 23 October 2026.
-The Zurich tariff is in section 35 of the Zurich tax law (LS 631.1); the law
-page links to the current text as a PDF.
-"""
-
 from decimal import Decimal as D
 
 ESTV_CIRCULAR_SOURCE = (
@@ -37,49 +26,33 @@ ZH_TAX_LAW_SOURCE = (
     "zhlex-ls/erlass-631_1-1997_06_08-1999_01_01-132.html"
 )
 
-# --- Employee social security (hypothetical social security) -----------------
-AHV_IV_EO_RATE = D("0.053")  # 4.35% + 0.7% + 0.25%
-ALV_RATE = D("0.011")  # unemployment insurance
-ALV_SALARY_CEILING = D("148200")  # no contribution above this (no solidarity rate)
+AHV_IV_EO_RATE = D("0.053")  
+ALV_RATE = D("0.011")  
+ALV_SALARY_CEILING = D("148200")  
 
-# --- Deductions the ESTV calculator makes before tax -------------------------
-# Accident insurance outside work, paid by the employee (calculator notes: 0.4%,
-# salary capped at the maximum insured salary).
 NBU_RATE = D("0.004")
 NBU_SALARY_CEILING = D("148200")
 
-# Pension fund (BVG). NOT part of hypothetical social security (brief), but the
-# calculator deducts it when working out taxable income.
-# Limits from the BSV table of amounts valid from 1 January 2026. With the
-# contribution rates below they reproduce the calculator's CHF 5,988 for a
-# CHF 170,000 salary at age 35.
 EMPLOYEE_AGE = 35
 BVG_ENTRY_THRESHOLD = D("22680")
 BVG_MIN_COORDINATED_SALARY = D("3780")
 BVG_COORDINATION_DEDUCTION = D("26460")
-BVG_UPPER_LIMIT = D("90720")  # salary above this is "extra-mandatory"
-BVG_RATE_FROM_AGE = [  # (from age, total contribution rate on coordinated salary)
+BVG_UPPER_LIMIT = D("90720")  
+BVG_RATE_FROM_AGE = [  
     (55, D("0.18")),
     (45, D("0.15")),
     (35, D("0.10")),
     (25, D("0.07")),
 ]
 BVG_EXTRA_MANDATORY_RATE = D("0.07")
-BVG_EMPLOYEE_SHARE = D("0.5")  # the calculator takes half as the employee's part
+BVG_EMPLOYEE_SHARE = D("0.5")  
 
-# Flat-rate professional expenses: 3% of net salary, min CHF 2,000, max CHF 4,000
-# (federal 2026 return guide, item 10; Zurich 2026 guide, same rule).
-# Insurance deduction for a single person with pillar-2 contributions: federal
-# CHF 1,800 (federal 2026 return guide, item 14); Zurich CHF 2,900 (Zurich 2026
-# return guide, item 15, "Übrige Steuerpflichtige").
 PROFESSIONAL_EXPENSES_RATE = D("0.03")
 PROFESSIONAL_EXPENSES_MIN = D("2000")
 PROFESSIONAL_EXPENSES_MAX = D("4000")
 INSURANCE_DEDUCTION_CANTON = D("2900")
 INSURANCE_DEDUCTION_FEDERAL = D("1800")
 
-# --- Direct federal tax, single person tariff 2026 (Art. 36 DBG) ---------------
-# (taxable income from, tax at that income, extra tax per further CHF 100)
 FEDERAL_TARIFF = [
     (D("15200"), D("0"), D("0.77")),
     (D("33200"), D("138.60"), D("0.88")),
@@ -92,13 +65,10 @@ FEDERAL_TARIFF = [
     (D("185100"), D("10936.55"), D("13.20")),
     (D("793900"), D("91298.15"), D("0")),
 ]
-FEDERAL_FLAT_FROM = D("794000")  # from here the tax is 11.5% of the whole income
+FEDERAL_FLAT_FROM = D("794000")  
 FEDERAL_FLAT_RATE = D("0.115")
-FEDERAL_MIN_TAX = D("25")  # amounts below this are not collected
+FEDERAL_MIN_TAX = D("25")  
 
-# --- Canton of Zurich ---------------------------------------------------------
-# Basic tax (einfache Staatssteuer), Grundtarif, section 35 para 1 StG, valid from
-# tax period 2026. (width of the band in CHF, rate). None = all income above.
 ZH_BASIC_TARIFF = [
     (D("7000"), D("0")),
     (D("5000"), D("0.02")),
@@ -114,11 +84,9 @@ ZH_BASIC_TARIFF = [
     (D("69300"), D("0.12")),
     (None, D("0.13")),
 ]
-ZH_CANTON_MULTIPLIER = D("0.95")  # Staatssteuerfuss 2026
-ZH_CITY_MULTIPLIER = D("1.19")  # city of Zurich, without church tax
-# Flat personal tax per person, charged by the municipality (sections 187 and
-# 200 of the Zurich tax law). The ESTV brochure is for tax period 2025; the
-# calculator shows the same CHF 24 for 2026.
+ZH_CANTON_MULTIPLIER = D("0.95")  
+ZH_CITY_MULTIPLIER = D("1.19")  
+
 ZH_PERSONAL_TAX = D("24")
 
 RULES = [
