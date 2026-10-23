@@ -3,9 +3,8 @@
 Each topic is one box: a title, a short summary (2 to 3 sentences) and the
 official GOV.UK pages the summary came from.
 
-Researched on 20 October 2026 from GOV.UK. Fees and thresholds change often:
-re-check each figure against its page before submitting. Home Office fees are
-from the table effective 8 October 2026.
+Researched on 20 October 2026 from GOV.UK. Home Office fees are from the
+table effective 8 October 2026.
 
 Test case: a Swiss national paid CHF 150,000 salary (about GBP 136,000 at
 CHF 1.10), sent by their Swiss employer to its UK subsidiary for 2 years after

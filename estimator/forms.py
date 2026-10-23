@@ -116,8 +116,6 @@ class AssignmentForm(forms.Form):
             ),
         ]
         return AssignmentInputs(
-            home_country=d["home_country"],
-            host_country=d["host_country"],
             salary_chf=d["salary_chf"],
             bonus_chf=d["bonus_chf"],
             years=d["years"],

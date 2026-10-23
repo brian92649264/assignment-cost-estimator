@@ -4,14 +4,12 @@ Every rule carries the official page it came from, so the interface can show a
 link next to each one. Keep values and sources together in this file.
 
 Every number below was checked against the two GOV.UK pages named in the
-sources. VERIFIED controls the "draft figures" banner on the page: set it back
-to False if you change a rate before re-checking it.
+sources.
 """
 
 from decimal import Decimal as D
 
 TAX_YEAR = "2026/27"
-VERIFIED = True
 
 INCOME_TAX_SOURCE = "https://www.gov.uk/income-tax-rates"
 EMPLOYER_RATES_SOURCE = (
@@ -37,11 +35,8 @@ EMPLOYER_NI_SECONDARY_THRESHOLD = D("5000")  # per year
 # country's system with a certificate of coverage (PDA1), and the employer's
 # liability follows the employee's. The test case is exactly 2 years, so Swiss
 # social security continues and no UK National Insurance is due.
+# The rule and its source are in swiss_rates.RULES.
 SOCIAL_SECURITY_SYSTEM = "CH"
-SOCIAL_SECURITY_SOURCE = (
-    "https://www.gov.uk/guidance/social-security-contributions-for-workers-"
-    "coming-to-the-uk-from-the-eea-or-switzerland"
-)
 
 # Shown on the page under "Rules and sources". Entries must have a source.
 RULES = [

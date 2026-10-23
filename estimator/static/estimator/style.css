@@ -5,7 +5,6 @@
   --bg: #f7f8fa;
   --card: #fff;
   --accent: #2b5fd9;
-  --warn-bg: #fff6e0;
   --err: #b42318;
   --err-bg: #fef3f2;
 }
@@ -23,10 +22,8 @@ main { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
 h1 { margin: 0 0 4px; font-size: 1.7rem; }
 h2 { margin: 24px 0 8px; font-size: 1.3rem; }
 h3 { margin: 28px 0 8px; font-size: 1.05rem; }
-.lede, .hint, .muted { color: var(--muted); }
+.lede, .hint { color: var(--muted); }
 .hint { margin: 0 0 12px; font-size: .9rem; }
-
-.banner { background: var(--warn-bg); border: 1px solid #f0d68a; padding: 10px 14px; border-radius: 8px; font-size: .9rem; }
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 20px 0 24px; }
 .tabs button {
@@ -38,20 +35,20 @@ h3 { margin: 28px 0 8px; font-size: 1.05rem; }
 fieldset { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px 6px; margin: 0 0 16px; }
 legend { padding: 0 6px; font-weight: 600; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 18px; }
+.grid.benefits { grid-template-columns: 1fr 1fr; max-width: 640px; margin: 0 auto; }
+@media (max-width: 560px) { .grid.benefits { grid-template-columns: 1fr; } }
 
 .field label { display: block; font-size: .9rem; font-weight: 600; margin-bottom: 4px; }
 .field input, .field select {
   width: 100%; padding: 9px 10px; font: inherit; border: 1px solid #cfd4dc; border-radius: 8px; background: #fff;
 }
-.field small { display: block; color: var(--muted); font-size: .8rem; margin: 4px 0 10px; }
 .field.has-error input, .field.has-error select { border-color: var(--err); }
 
-button.primary { background: var(--accent); color: #fff; border: 0; padding: 11px 22px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
+button.primary { display: block; margin: 0 auto; background: var(--accent); color: #fff; border: 0; padding: 11px 22px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
 button.primary:hover { filter: brightness(.95); }
 
 .errors { background: var(--err-bg); border: 1px solid #fda29b; color: var(--err); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
 .errors ul { margin: 6px 0 0; padding-left: 18px; }
-.notice { background: var(--warn-bg); border: 1px solid #f0d68a; padding: 12px 16px; border-radius: 8px; margin-top: 20px; }
 
 .summary { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 4px; }
 .summary > div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; min-width: 200px; }
@@ -61,7 +58,7 @@ button.primary:hover { filter: brightness(.95); }
 table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 th, td { padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-tr.section th { background: #f2f4f7; font-size: .85rem; text-transform: none; }
+tr.section th { background: #f2f4f7; font-size: .85rem; }
 tfoot th, tfoot td { border-bottom: 0; background: #f9fafb; }
 .tag { display: inline-block; margin-left: 8px; padding: 1px 8px; font-size: .72rem; border-radius: 99px; background: #eef2ff; color: #3b4cca; }
 .note { display: block; color: var(--muted); font-size: .8rem; }
@@ -72,29 +69,5 @@ summary { cursor: pointer; color: var(--accent); }
 
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px 18px 14px; margin-bottom: 12px; }
 .card h3 { margin-top: 14px; }
+.card-sources { text-align: center; margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
 .sources { padding-left: 18px; }
-
-
-.grid.benefits {
-  grid-template-columns: 1fr 1fr;
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-@media (max-width: 560px) {
-  .grid.benefits { grid-template-columns: 1fr; }
-}
-
-button.primary {
-  display: block;
-  margin: 0 auto;
-}
-
-.card-sources {
-  text-align: center;
-  margin: 14px 0 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
-  font-size: .9rem;
-  color: var(--muted);
-}

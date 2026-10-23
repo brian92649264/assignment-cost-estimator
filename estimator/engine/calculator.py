@@ -44,8 +44,6 @@ class Benefit:
 
 @dataclass(frozen=True)
 class AssignmentInputs:
-    home_country: str
-    host_country: str
     salary_chf: D
     bonus_chf: D
     years: int
@@ -107,13 +105,12 @@ def calculate(
     inputs: AssignmentInputs, swiss: ModuleType = swiss_module
 ) -> AssignmentResult:
     """Run the full estimate. `swiss` is injectable so tests can use fixed rates."""
-    fx = inputs.chf_per_gbp
     # One £8,000 removal exemption covers the whole assignment, so we carry
     # what is left from one year into the next.
     removal_left = uk_benefits.REMOVAL_EXEMPTION_LIMIT
     years = []
     for n in range(1, inputs.years + 1):
-        year, removal_left = _calculate_year(n, inputs, swiss, fx, removal_left)
+        year, removal_left = _calculate_year(n, inputs, swiss, removal_left)
         years.append(year)
     return AssignmentResult(years=years, assumptions=_assumptions(inputs))
 
@@ -153,9 +150,9 @@ def _calculate_year(
     year_number: int,
     inputs: AssignmentInputs,
     swiss: ModuleType,
-    fx: D,
     removal_left: D,
 ) -> tuple[YearResult, D]:
+    fx = inputs.chf_per_gbp
     # 1. Home pay
     salary = inputs.salary_chf / fx
     bonus = inputs.bonus_chf / fx
@@ -228,7 +225,6 @@ def _calculate_year(
 
 
 def _assumptions(inputs: AssignmentInputs) -> list[str]:
-    # TODO(you): keep this list in step with the choices you actually make.
     return [
         f"UK {uk_rates.TAX_YEAR} rates are used for every year of the assignment.",
         "England income tax bands apply, because the employee works in London.",

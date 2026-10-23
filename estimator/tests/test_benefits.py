@@ -27,8 +27,6 @@ FAKE_SWISS = SimpleNamespace(
 
 def make_inputs(benefits, years=2):
     return AssignmentInputs(
-        home_country="CH",
-        host_country="GB",
         salary_chf=D("100000"),
         bonus_chf=D("0"),
         years=years,

@@ -1,5 +1,7 @@
-from django.urls import include, path
+from django.urls import path
+
+from estimator import views
 
 urlpatterns = [
-    path("", include("estimator.urls")),
+    path("", views.index, name="index"),
 ]

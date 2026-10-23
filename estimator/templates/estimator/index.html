@@ -13,10 +13,6 @@
     <p class="lede">Switzerland to UK. What an international assignment costs the employer, and what it takes to arrange. An exercise, not tax advice.</p>
   </header>
 
-  {% if not rates_verified %}
-  <p class="banner" role="note">Rates in this build have not been checked against their sources yet. Treat all figures as draft.</p>
-  {% endif %}
-
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" id="tab-cost" aria-controls="panel-cost" aria-selected="true">Cost estimate</button>
     <button type="button" role="tab" id="tab-immigration" aria-controls="panel-immigration" aria-selected="false">Immigration</button>
@@ -65,12 +61,6 @@
 
       <button type="submit" class="primary">Calculate cost</button>
     </form>
-
-    {% if not_built_message %}
-    <div class="notice" role="status">
-      <strong>Not available yet.</strong> {{ not_built_message }}
-    </div>
-    {% endif %}
 
     {% if result %}
     <div class="result">
@@ -136,12 +126,12 @@
     <h2>Immigration</h2>
     {% for topic in immigration_topics %}
     <article class="card">
-  <h3>{{ topic.title }}</h3>
-  <p>{{ topic.summary }}</p>
-  <p class="card-sources">Sources:
-    {% for source in topic.sources %}<a href="{{ source.url }}" target="_blank" rel="noopener">{{ source.label }}</a>{% if not forloop.last %} &middot; {% endif %}{% endfor %}
-  </p>
-</article>
+      <h3>{{ topic.title }}</h3>
+      <p>{{ topic.summary }}</p>
+      <p class="card-sources">Sources:
+        {% for source in topic.sources %}<a href="{{ source.url }}" target="_blank" rel="noopener">{{ source.label }}</a>{% if not forloop.last %} &middot; {% endif %}{% endfor %}
+      </p>
+    </article>
     {% endfor %}
   </section>
 </main>

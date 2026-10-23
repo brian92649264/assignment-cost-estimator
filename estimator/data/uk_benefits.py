@@ -1,9 +1,6 @@
 """UK tax treatment of assignment benefits, with the HMRC page for each rule.
 
-Researched on 20 October 2026 from GOV.UK and HMRC manuals. Re-check each page
-before submitting: the manuals are updated often.
-
-TODO(you): read each page below and confirm it says what the rule claims.
+Researched on 20 October 2026 from GOV.UK and HMRC manuals.
 """
 
 from decimal import Decimal as D
@@ -21,7 +18,6 @@ HS212 = (
     "https://www.gov.uk/government/publications/tax-equalisation-hs212-"
     "self-assessment-helpsheet/tax-equalisation-2026-hs212"
 )
-PAYE72028 = "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye72028"
 
 # Short notes shown beside each benefit in the cost table.
 HOUSING_NOTE = "Rent paid to the landlord for the employee counts as earnings."

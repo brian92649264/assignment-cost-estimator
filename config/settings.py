@@ -29,7 +29,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -39,13 +38,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
         "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-            ],
-        },
     },
 ]
 
@@ -55,10 +48,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {}
 
 LANGUAGE_CODE = "en-gb"
-TIME_ZONE = "Europe/London"
 USE_I18N = False
-USE_TZ = True
 
 STATIC_URL = "static/"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

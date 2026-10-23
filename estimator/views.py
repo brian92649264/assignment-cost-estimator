@@ -6,23 +6,15 @@ from .forms import TEST_CASE_INITIAL, AssignmentForm
 
 
 def index(request):
-    context = {
-        "immigration_topics": immigration.TOPICS,
-        "rules": uk_rates.RULES + uk_benefits.RULES + swiss_rates.RULES,
-        "rates_verified": uk_rates.VERIFIED,
-        "tax_year": uk_rates.TAX_YEAR,
-        "active_tab": "cost",
-    }
-
     if request.method == "POST":
         form = AssignmentForm(request.POST)
-        if form.is_valid():
-            try:
-                context["result"] = calculate(form.to_inputs())
-            except NotImplementedError as exc:
-                context["not_built_message"] = str(exc)
     else:
         form = AssignmentForm(initial=TEST_CASE_INITIAL)
 
-    context["form"] = form
+    context = {
+        "form": form,
+        "result": calculate(form.to_inputs()) if form.is_valid() else None,
+        "rules": uk_rates.RULES + uk_benefits.RULES + swiss_rates.RULES,
+        "immigration_topics": immigration.TOPICS,
+    }
     return render(request, "estimator/index.html", context)

@@ -81,8 +81,6 @@ class CalculatorTests(SimpleTestCase):
 
     def make_inputs(self, years=2):
         return AssignmentInputs(
-            home_country="CH",
-            host_country="GB",
             salary_chf=D("150000"),
             bonus_chf=D("20000"),
             years=years,

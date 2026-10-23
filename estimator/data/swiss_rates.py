@@ -11,8 +11,6 @@ page links to the current text as a PDF.
 
 from decimal import Decimal as D
 
-TAX_YEAR = "2026"
-
 ESTV_CIRCULAR_SOURCE = (
     "https://www.estv.admin.ch/dam/de/sd-web/vFK3ntWLQ4s4/2-215-D-2025-d.pdf"
 )
