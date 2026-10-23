@@ -3,14 +3,15 @@
 Every rule carries the official page it came from, so the interface can show a
 link next to each one. Keep values and sources together in this file.
 
-TODO(you): open each source below and confirm every number. Until you have,
-leave VERIFIED = False; the page shows a warning banner while it is False.
+Every number below was checked against the two GOV.UK pages named in the
+sources. VERIFIED controls the "draft figures" banner on the page: set it back
+to False if you change a rate before re-checking it.
 """
 
 from decimal import Decimal as D
 
 TAX_YEAR = "2026/27"
-VERIFIED = False
+VERIFIED = True
 
 INCOME_TAX_SOURCE = "https://www.gov.uk/income-tax-rates"
 EMPLOYER_RATES_SOURCE = (
@@ -32,11 +33,15 @@ EMPLOYER_NI_RATE = D("0.15")
 EMPLOYER_NI_SECONDARY_THRESHOLD = D("5000")  # per year
 
 # Which country's social security applies during the assignment: "CH" or "UK".
-# TODO(you): decide from the UK-Switzerland social security convention and
-# explain the rule in the README and the Loom. Check how the 24 month
-# assignment length in the test case interacts with the rule.
+# Decision: a worker posted to the UK for up to 2 years stays in the home
+# country's system with a certificate of coverage (PDA1), and the employer's
+# liability follows the employee's. The test case is exactly 2 years, so Swiss
+# social security continues and no UK National Insurance is due.
 SOCIAL_SECURITY_SYSTEM = "CH"
-SOCIAL_SECURITY_SOURCE = None  # TODO(you): add the GOV.UK page for the convention
+SOCIAL_SECURITY_SOURCE = (
+    "https://www.gov.uk/guidance/social-security-contributions-for-workers-"
+    "coming-to-the-uk-from-the-eea-or-switzerland"
+)
 
 # Shown on the page under "Rules and sources". Entries must have a source.
 RULES = [

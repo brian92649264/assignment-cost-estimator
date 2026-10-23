@@ -231,6 +231,9 @@ def _assumptions(inputs: AssignmentInputs) -> list[str]:
     # TODO(you): keep this list in step with the choices you actually make.
     return [
         f"UK {uk_rates.TAX_YEAR} rates are used for every year of the assignment.",
+        "England income tax bands apply, because the employee works in London.",
+        "No pension contributions or Gift Aid, so adjusted net income (used for "
+        "the personal allowance taper) equals taxable pay.",
         f"Exchange rate fixed at £1 = CHF {inputs.chf_per_gbp} for all years.",
         "The employee is UK tax resident throughout and leaves Swiss tax residence.",
         "The UK subsidiary runs the payroll; the employer pays all UK income tax.",
